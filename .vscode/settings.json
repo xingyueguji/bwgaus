@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "pesudoex.C": "cpp",
+        "doexperiment.C": "cpp",
+        "ostream": "cpp"
+    }
+}
