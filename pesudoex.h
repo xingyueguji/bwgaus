@@ -13,12 +13,14 @@ class pesudoex
 
 public:
     pesudoex();
+    pesudoex(double bwmean, double bwwidth, double secondbwmean, double secondbwwidth);
     ~pesudoex();
 
     RooFFTConvPdf *dofftconvolution(RooAbsPdf *pdf1, RooAbsPdf *pdf2, RooRealVar *x);
+    RooFormulaVar *CreateRatio(const RooAbsPdf *pdf1, const RooAbsPdf *pdf2, RooRealVar *x);
     double findMaxValue(RooAbsPdf *pdf, RooRealVar *x);
     double findFWHM(RooAbsPdf *pdf, RooRealVar *x);
-    void plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const char *canvasName = "pdfCanvas");
+    void plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const char *canvasName = "pdfCanvas", const char* filename = "");
     double ComputeStdDevNumerical(RooAbsPdf *pdf, RooRealVar *var, int nSteps = 1000);
     double ComputeMeanNumerical(RooAbsPdf *pdf, RooRealVar *var, int nSteps = 1000);
 
@@ -31,6 +33,10 @@ public:
     RooRealVar *bwmean;
     RooRealVar *width;
     RooBreitWigner *bw;
+
+    RooRealVar *bwmean2;
+    RooRealVar *width2;
+    RooBreitWigner *bw2;
 
     RooRealVar *bwgausmean;
     RooRealVar *bwgaussig;
@@ -47,7 +53,7 @@ public:
 
 pesudoex::pesudoex()
 {
-    x = new RooRealVar("roomass", "roomass", 60, 120);
+    x = new RooRealVar("x", "x", 60, 120);
 
     x->setBinning(RooBinning(10000, 60, 120), "cache");
     bwmean = new RooRealVar("bwmean", "bwmean", 91);
@@ -61,6 +67,20 @@ pesudoex::pesudoex()
     Gausmean = new RooRealVar("Gausmean", "Gausmean", 0);
     Gaussigma = new RooRealVar("Gaussigma", "Gaussigma", 0.6);
     Gaus = new RooGaussian("Gaus", "Gaus", *x, *Gausmean, *Gaussigma);
+}
+
+pesudoex::pesudoex(double bwmean1, double bwwidth1, double secondbwmean, double secondbwwidth)
+{
+    x = new RooRealVar("x", "x", 60, 120);
+
+    x->setBinning(RooBinning(10000, 60, 120), "cache");
+    bwmean = new RooRealVar("bwmean", "bwmean", bwmean1);
+    width = new RooRealVar("width", "width", bwwidth1);
+    bw = new RooBreitWigner("bw", "bw", *x, *bwmean, *width);
+
+    bwmean2 = new RooRealVar("bwmean2", "bwmean2", secondbwmean);
+    width2 = new RooRealVar("width2", "width2", secondbwwidth);
+    bw2 = new RooBreitWigner("bw2", "bw2", *x, *bwmean2, *width2);
 }
 
 double pesudoex::ComputeMeanNumerical(RooAbsPdf *pdf, RooRealVar *var, int nSteps = 1000)
@@ -113,7 +133,7 @@ double pesudoex::ComputeStdDevNumerical(RooAbsPdf *pdf, RooRealVar *var, int nSt
     double variance = 0.0;
     double norm = 0.0;
 
-    double mean = ComputeMeanNumerical(pdf,var,nSteps);
+    double mean = ComputeMeanNumerical(pdf, var, nSteps);
 
     // Iterate over the range of the variable
     for (int i = 0; i <= nSteps; ++i)
@@ -145,7 +165,7 @@ double pesudoex::findMaxValue(RooAbsPdf *pdf, RooRealVar *x)
     double maxVal = -1.0;      // Initialize with a small value
     double xMax = x->getMin(); // Initialize max position
 
-    double step = (x->getMax() - x->getMin()) / 1000000.0; // Adjust resolution
+    double step = (x->getMax() - x->getMin()) / 10000.0; // Adjust resolution
     for (double xx = x->getMin(); xx <= x->getMax(); xx += step)
     {
         x->setVal(xx);              // Set the value of x
@@ -171,7 +191,7 @@ double pesudoex::findFWHM(RooAbsPdf *pdf, RooRealVar *x)
     // Step 3: Scan for FWHM boundaries
     double xLow = x->getMin();
     double xHigh = x->getMax();
-    double step = (xHigh - xLow) / 1000000.0; // Adjust resolution as needed
+    double step = (xHigh - xLow) / 10000.0; // Adjust resolution as needed
 
     bool foundLow = false, foundHigh = false;
     double lowerBound = xLow, upperBound = xHigh;
@@ -197,10 +217,12 @@ double pesudoex::findFWHM(RooAbsPdf *pdf, RooRealVar *x)
     return upperBound - lowerBound;
 }
 
-void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const char *canvasName = "pdfCanvas")
+void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const char *canvasName = "pdfCanvas", const char* filename = "")
 {
     // Create a canvas
-    TCanvas *canvas = new TCanvas(canvasName, "PDF Plot", 800, 600);
+    TCanvas *canvas = new TCanvas(canvasName, "PDF Plot", 1200, 600);
+    canvas->Divide(2, 1);
+    canvas->cd(1);
 
     // Set up general canvas cosmetics
     canvas->SetLeftMargin(0.15);
@@ -237,13 +259,11 @@ void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const cha
     pt->SetMargin(0.02);
     double FWHM = this->findFWHM(pdf, x);
     double FWHM2 = this->findFWHM(pdf2, x);
-    double STD = this->ComputeStdDevNumerical(pdf,x,1000000);
-    double STD2 = this->ComputeStdDevNumerical(pdf2,x,1000000);
-    pt->AddText(Form("FWHM = %.4f", FWHM));
-    pt->AddText(Form("STD = %.4f", STD));
-    pt->AddText(Form("Assumption STD + STD = %.4f", sqrt(pow(STD2,2) + pow(0.6,2)) ));
-    pt->AddText(Form("Assumption STD (Gamma) + STD = %.4f", sqrt(pow(FWHM2,2) + pow(0.6,2)) ));
-    pt->AddText(Form("Assumption FWHM from STD (Gamma) + STD = %.4f", 2.355* sqrt(pow(FWHM2,2) + pow(0.6,2)) ));
+    pt->AddText(Form("FWHM of bw = %.4f", FWHM));
+    pt->AddText(Form("FWHM of bw2 = %.4f", FWHM2));
+    pt->AddText(Form("Mean of bw = %.4f", this->ComputeMeanNumerical(pdf, x)));
+    pt->AddText(Form("Mean of bw2 = %.4f", this->ComputeMeanNumerical(pdf2, x)));
+    pt->AddText("Blue is original, Red is modified");
 
     pt->Draw();
 
@@ -252,5 +272,43 @@ void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const cha
     gPad->Modified();
     gPad->Update();
 
-    canvas->SaveAs(Form("%s.png", canvasName));
+    canvas->cd(2);
+
+    RooFormulaVar *ratio = this->CreateRatio(pdf2, pdf, x);
+    TF1* ratioTF1 = ratio->asTF(*x);
+
+    ratioTF1->SetNpx(10000);
+    ratioTF1->Draw();
+
+    canvas->Draw();
+
+    TFile *file = new TFile(filename, "UPDATE");
+    file->cd();
+
+    TString postname = canvasName;
+    TString num = "modified_";
+    TString deno = "original_";
+
+    ratioTF1->Write(canvasName,2);
+
+    // Close the file
+    file->Close();
+
+    canvas->SaveAs(Form("./plot/%s.png", canvasName));
+
+    //delete graph;
+    // delete file;
+    delete canvas;
+}
+
+RooFormulaVar *pesudoex::CreateRatio(const RooAbsPdf *pdf1, const RooAbsPdf *pdf2, RooRealVar *x)
+{
+    // Ensure pdf1 and pdf2 share the same variable x
+    RooArgList pdfs;
+    pdfs.add(*pdf1);
+    pdfs.add(*pdf2);
+
+    // Create the ratio formula
+    RooFormulaVar *ratio = new RooFormulaVar("ratio", "Ratio PDF", "@0/@1", pdfs);
+    return ratio;
 }

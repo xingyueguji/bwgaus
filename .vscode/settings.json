@@ -2,6 +2,12 @@
     "files.associations": {
         "pesudoex.C": "cpp",
         "doexperiment.C": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "createratio.C": "cpp",
+        "array": "cpp",
+        "span": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "vector": "cpp"
     }
 }
