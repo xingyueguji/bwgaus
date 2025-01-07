@@ -1,7 +1,13 @@
 #include "pesudoex.h"
 
-void createratio(TString filename = "pp_eta.root", double shiftlowbin = -0.15, double shifthighbin = -0.1, double smearlowbin = -0.5, double smearhighbin = 0.5)
+void createratio(TString filename = "20-30_theory.root", double shiftlowbin = -0.2451, double shifthighbin = -0.2451, double smearlowbin = 0.3062, double smearhighbin = 0.3062)
 {
+
+    /*ZInvMassTheory = {-0.06287, -0.1768, -0.2451, -0.3271, -0.3362, -0.3294, -0.2702};
+    ZWidthTheory = {0.08064, 0.2219, 0.3062, 0.4018, 0.4246, 0.4155, 0.354};
+
+    Each of these numbers in the arrays above are organized in the following centrality scheme : 
+    (0 - 10), (10 - 20), (20 - 30), (30 - 40), (40 - 50), (50 - 60) and (60 - 70).*/
 
     const int nbins_mass_shift = 21;
     const int nbins_smear = 21;
@@ -30,12 +36,14 @@ void createratio(TString filename = "pp_eta.root", double shiftlowbin = -0.15, d
         cout << "smear bin " << j << " is " << smear_bin[j] << endl;
     }
 
+    TNamed *namedString = new TNamed("Description", Form("This is shift %.5f_%.5f smear %.5f_%.5f", shiftlowbin, shifthighbin, smearlowbin, smearhighbin));
+
     for (int i = 0; i < nbins_mass_shift; i++)
     {
         for (int j = 0; j < nbins_smear; j++)
         {
             pesudoex *o1 = new pesudoex(91.1876, 2.4955, 91.1876 + shift_bin[i], 2.4955 + smear_bin[j]);
-            o1->plotPdf(o1->bw, o1->bw2, o1->x, Form("Compare_shift_%i_smear_%i", i, j),filename);
+            o1->plotPdf(o1->bw, o1->bw2, o1->x, namedString, Form("Compare_shift_%i_smear_%i", i, j), filename);
         }
     }
 }

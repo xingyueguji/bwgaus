@@ -20,7 +20,7 @@ public:
     RooFormulaVar *CreateRatio(const RooAbsPdf *pdf1, const RooAbsPdf *pdf2, RooRealVar *x);
     double findMaxValue(RooAbsPdf *pdf, RooRealVar *x);
     double findFWHM(RooAbsPdf *pdf, RooRealVar *x);
-    void plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const char *canvasName = "pdfCanvas", const char* filename = "");
+    void plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, TNamed *TNamed, const char *canvasName = "pdfCanvas", const char *filename = "");
     double ComputeStdDevNumerical(RooAbsPdf *pdf, RooRealVar *var, int nSteps = 1000);
     double ComputeMeanNumerical(RooAbsPdf *pdf, RooRealVar *var, int nSteps = 1000);
 
@@ -217,7 +217,7 @@ double pesudoex::findFWHM(RooAbsPdf *pdf, RooRealVar *x)
     return upperBound - lowerBound;
 }
 
-void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const char *canvasName = "pdfCanvas", const char* filename = "")
+void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, TNamed *TNamed, const char *canvasName = "pdfCanvas", const char *filename = "")
 {
     // Create a canvas
     TCanvas *canvas = new TCanvas(canvasName, "PDF Plot", 1200, 600);
@@ -275,7 +275,7 @@ void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const cha
     canvas->cd(2);
 
     RooFormulaVar *ratio = this->CreateRatio(pdf2, pdf, x);
-    TF1* ratioTF1 = ratio->asTF(*x);
+    TF1 *ratioTF1 = ratio->asTF(*x);
 
     ratioTF1->SetNpx(10000);
     ratioTF1->Draw();
@@ -289,15 +289,16 @@ void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, const cha
     TString num = "modified_";
     TString deno = "original_";
 
-    ratioTF1->Write(canvasName,2);
+    ratioTF1->Write(canvasName, 2);
+    TNamed->Write("",2);
 
     // Close the file
     file->Close();
 
-    canvas->SaveAs(Form("./plot/%s.png", canvasName));
+    canvas->SaveAs(Form("./plot/%s/%s.png", filename, canvasName));
 
-    //delete graph;
-    // delete file;
+    // delete graph;
+    //  delete file;
     delete canvas;
 }
 
