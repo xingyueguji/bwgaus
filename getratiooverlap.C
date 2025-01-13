@@ -5,7 +5,7 @@
 #include <TStyle.h>
 #include <TFile.h>
 
-void getratiooverlap(TString data = "eta_20_30.root", TString theory = "20-30_theory.root")
+void getratiooverlap(TString data = "eta_0_10.root", TString theory = "0-10_theory.root")
 {
     const int nbins_cent = 11;
     const int nbins_smear = 21;
@@ -56,6 +56,8 @@ void getratiooverlap(TString data = "eta_20_30.root", TString theory = "20-30_th
             tf_pesudoexp[i][j]->Draw("SAME");
         }
     }
+
+    tf_theory->Draw("SAME");
 
     auto legend = new TLegend(0.2, 0.2, 0.4, 0.4);
     legend->AddEntry(tf_theory, "Theory (Red)", "l");
