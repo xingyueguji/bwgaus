@@ -220,7 +220,7 @@ double pesudoex::findFWHM(RooAbsPdf *pdf, RooRealVar *x)
 void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, TNamed *TNamed, const char *canvasName = "pdfCanvas", const char *filename = "")
 {
     // Create a canvas
-    TCanvas *canvas = new TCanvas(canvasName, "PDF Plot", 1200, 600);
+    /*TCanvas *canvas = new TCanvas(canvasName, "PDF Plot", 1200, 600);
     canvas->Divide(2, 1);
     canvas->cd(1);
 
@@ -280,7 +280,9 @@ void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, TNamed *T
     ratioTF1->SetNpx(10000);
     ratioTF1->Draw();
 
-    canvas->Draw();
+    canvas->Draw();*/
+    RooFormulaVar *ratio = this->CreateRatio(pdf2, pdf, x);
+    TF1 *ratioTF1 = ratio->asTF(*x);
 
     TFile *file = new TFile(filename, "UPDATE");
     file->cd();
@@ -295,11 +297,11 @@ void pesudoex::plotPdf(RooAbsPdf *pdf, RooAbsPdf *pdf2, RooRealVar *x, TNamed *T
     // Close the file
     file->Close();
 
-    canvas->SaveAs(Form("./plot/%s/%s.png", filename, canvasName));
+    //canvas->SaveAs(Form("./plot/%s/%s.png", filename, canvasName));
 
     // delete graph;
     //  delete file;
-    delete canvas;
+    //delete canvas;
 }
 
 RooFormulaVar *pesudoex::CreateRatio(const RooAbsPdf *pdf1, const RooAbsPdf *pdf2, RooRealVar *x)
