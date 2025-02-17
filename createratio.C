@@ -9,8 +9,8 @@ void createratio(TString filename = "20-30_theory.root", double shiftlowbin = -0
     Each of these numbers in the arrays above are organized in the following centrality scheme : 
     (0 - 10), (10 - 20), (20 - 30), (30 - 40), (40 - 50), (50 - 60) and (60 - 70).*/
 
-    const int nbins_mass_shift = 21;
-    const int nbins_smear = 21;
+    const int nbins_mass_shift = 42;
+    const int nbins_smear = 42;
     const int nbins_cent = 11;
 
     double shift_bin[nbins_mass_shift];

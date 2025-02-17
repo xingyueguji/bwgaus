@@ -9,6 +9,12 @@
         "string": "cpp",
         "string_view": "cpp",
         "vector": "cpp",
-        "getratiooverlap.C": "cpp"
+        "getratiooverlap.C": "cpp",
+        "run_ratio.C": "cpp",
+        "run_ratio copy.C": "cpp",
+        "run_ratio_zoomed_in.C": "cpp",
+        "run_ratio_zoom_in.C": "cpp",
+        "run_ratio_zoomed_in copy.C": "cpp",
+        "run_ratio_zoomed_in_pp.C": "cpp"
     }
 }
