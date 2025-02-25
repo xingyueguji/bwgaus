@@ -46,9 +46,9 @@ void run_ratio_zoomed_in()
   int centlowlimit[5] = {0, 10, 20, 30, 0};
   int centhighlimit[5] = {10, 20, 30, 100, 100};
 
-  TString variation[7] = {"nominal", "tnpU", "tnpD", "acooff", "nominal_no_bk_sub", "nominal_binning", "nominal_range"};
+  TString variation[9] = {"nominal", "tnpU", "tnpD", "acooff", "nominal_no_bk_sub", "nominal_binning", "nominal_range", "HF_up", "HF_down"};
 
-  for (int var = 0; var < 7; var++)
+  for (int var = 0; var < 9; var++)
   {
     for (int cent = 0; cent < 5; cent++)
     {
